@@ -1,0 +1,75 @@
+//Criando um back end usando Node.js e Express
+    ´´´node
+	npm install express body-parser twilio
+    ´´´
+
+<!--Criando página Web-->
+<!DOCTYPE html>
+<html lang="pt-Br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta author="Maciel Oliveira">
+  <title>Enviar Mensagem</title>
+</head>
+<body>
+  <h1>Enviar Mensagem WhatsApp</h1>
+  <form action="/enviar-mensagem" method="post">
+    <label for="numero">Número do Destinatário:</label>
+    <input type="text" id="numero" name="numero" required>
+    <button type="submit">Enviar Mensagem</button>
+  </form>
+
+  <script>
+	<!--Criando o arquivo app.js para o servidor-->
+	´´´js
+     const express = require('express');
+     const bodyParser = require('body-parser');
+     const twilio = require('twilio');
+
+     const app = express();
+     const port = 3000;
+
+     app.use(bodyParser.urlencoded({ extended: false }));
+
+     const accountSid = 'SuaContaSID'; // Substitua com seu SID da conta Twilio
+     const authToken = 'SeuToken'; // Substitua com seu token da conta Twilio
+     const client = twilio(accountSid, authToken);
+
+     app.post('/enviar-mensagem', (req, res) => {
+    const numeroDestinatario = req.body.numero;
+  
+  client.messages
+    .create({
+      from: 'whatsapp:+14155238886', // Número do Twilio no formato whatsapp:
+      body: 'Olá, esta é uma mensagem automática do seu sistema de CRM.',
+      to: `whatsapp:+${numeroDestinatario}`,
+    })
+    .then(message => {
+      console.log(message.sid);
+      res.send('Mensagem enviada com sucesso!');
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send('Erro ao enviar mensagem.');
+    });
+});
+
+    app.listen(port, () => {
+     console.log(`Servidor rodando em http://localhost:${port}`);
+});
+	´´´
+
+    /*Certifique-se de substituir 'SuaContaSID' e 'SeuToken' com suas próprias informações do Twilio. Lembre-se de que este é um exemplo básico, e em um ambiente de produção, você precisaria adotar medidas de segurança adicionais e lidar com a autenticação de usuários.*/
+  </script>
+
+	<!--Executando o servidor com o comando 
+   ´´´node
+	node app.js
+   ´´´
+
+</body>
+</html>
+
+
+
